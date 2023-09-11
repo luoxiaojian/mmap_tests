@@ -16,20 +16,22 @@ int main(int argc, char** argv) {
     int thread_num = atoi(argv[2]);
     bool seq = (atoi(argv[3]) == 1);
     int hint = atoi(argv[4]);
-    size_t count = atoll(argv[5]);
+    int iter = atoi(argv[5]);
     size_t window_size = argc > 6 ? atoll(argv[6]) : std::numeric_limits<size_t>::max();
     int stride = argc > 7 ? atoi(argv[7]) : 1;
 
+    size_t fs = file_size(filename);
+    size_t elem_num = std::min(fs, window_size) / sizeof(uint8_t);
+    size_t count = static_cast<size_t>(iter) * elem_num / static_cast<size_t>(stride);
+
+    std::cout << "==============================================================" << std::endl;
     std::cout << "start mmap test: " << std::endl;
     std::cout << "\tthread_num = " << thread_num << std::endl;
     std::cout << (seq ? "\tsequential" : "\trandom") << std::endl;
     std::cout << (hint == 1 ? "\trandom hint" : (hint == 2 ? "\tsequential hint" : "\tnormal hint")) << std::endl;
-    std::cout << "\tcount = " << count << std::endl;
+    std::cout << "\titer = " << iter << ", count = " << count << std::endl;
     std::cout << "\twindow_size = " << window_size << std::endl;
     std::cout << "\tstride = " << stride << std::endl;
-
-    size_t fs = file_size(filename);
-    size_t elem_num = std::min(fs, window_size) / sizeof(uint8_t);
 
     int fd = open(filename.c_str(), O_RDONLY);
     uint8_t* data = (uint8_t*)mmap(NULL, fs, PROT_READ, MAP_SHARED, fd, 0);

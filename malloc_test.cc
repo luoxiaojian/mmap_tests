@@ -10,19 +10,22 @@
 int main(int argc, char** argv) {
     int thread_num = atoi(argv[1]);
     bool seq = (atoi(argv[2]) == 1);
-    size_t count = atoll(argv[3]);
+    int iter = atoi(argv[3]);
     size_t window_size = atoll(argv[4]);
-    int stride = atoi(argv[5]);
+    int stride = argc > 5 ? atoi(argv[5]) : 1;
 
+    size_t elem_num = window_size / sizeof(uint8_t);
+    size_t count = static_cast<size_t>(iter) * elem_num / static_cast<size_t>(stride);
+
+    std::cout << "==============================================================" << std::endl;
     std::cout << "start malloc test:" << std::endl;
     std::cout << "\tthread_num = " << thread_num << std::endl;
     std::cout << (seq ? "\tsequential" : "\trandom") << std::endl;
-    std::cout << "\tcount = " << count << std::endl;
+    std::cout << "\titer = " << iter << ", count = " << count << std::endl;
     std::cout << "\twindow_size = " << window_size << std::endl;
     std::cout << "\tstride = " << stride << std::endl;
 
     uint8_t* data = (uint8_t*)malloc(window_size);
-    size_t elem_num = window_size / sizeof(uint8_t);
     for (size_t i = 0; i < elem_num; ++i) {
         data[i] = i % 256;
     }
