@@ -13,4 +13,6 @@ find_package(Threads REQUIRED)
 add_executable(create_file create_file.cc)
 add_executable(mmap_test mmap_test.cc)
 target_link_libraries(mmap_test ${CMAKE_THREAD_LIBS_INIT})
+add_executable(malloc_test malloc_test.cc)
+target_link_libraries(malloc_test ${CMAKE_THREAD_LIBS_INIT})
 

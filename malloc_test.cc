@@ -3,11 +3,7 @@
 #include <thread>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <random>
-
-#include <sys/mman.h>
-#include <fcntl.h>
 
 #include "utils.h"
 
@@ -15,30 +11,21 @@ int main(int argc, char** argv) {
     std::string filename = argv[1];
     int thread_num = atoi(argv[2]);
     bool seq = (atoi(argv[3]) == 1);
-    int hint = atoi(argv[4]);
-    size_t count = atoll(argv[5]);
-    size_t window_size = argc > 6 ? atoll(argv[6]) : std::numeric_limits<size_t>::max();
-    int stride = argc > 7 ? atoi(argv[7]) : 1;
+    size_t count = atoll(argv[4]);
+    size_t window_size = atoll(argv[5]);
+    int stride = atoi(argv[6]);
 
-    std::cout << "start mmap test: " << std::endl;
+    std::cout << "start malloc test:" << std::endl;
     std::cout << "\tthread_num = " << thread_num << std::endl;
     std::cout << (seq ? "\tsequential" : "\trandom") << std::endl;
-    std::cout << (hint == 1 ? "\trandom hint" : (hint == 2 ? "\tsequential hint" : "\tnormal hint")) << std::endl;
     std::cout << "\tcount = " << count << std::endl;
     std::cout << "\twindow_size = " << window_size << std::endl;
     std::cout << "\tstride = " << stride << std::endl;
 
-    size_t fs = file_size(filename);
-    size_t elem_num = std::min(fs, window_size) / sizeof(uint8_t);
-
-    int fd = open(filename.c_str(), O_RDONLY);
-    uint8_t* data = (uint8_t*)mmap(NULL, fs, PROT_READ, MAP_SHARED, fd, 0);
-    if (hint == 1) {
-        madvise(data, fs, MADV_RANDOM);
-    } else if (hint == 2) {
-        madvise(data, fs, MADV_SEQUENTIAL);
-    } else {
-        madvise(data, fs, MADV_NORMAL);
+    uint8_t* data = (uint8_t*)malloc(window_size);
+    size_t elem_num = window_size / sizeof(uint8_t);
+    for (size_t i = 0; i < elem_num; ++i) {
+        data[i] = i % 256;
     }
 
     warmup(data, elem_num, stride);

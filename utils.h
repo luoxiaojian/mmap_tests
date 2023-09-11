@@ -19,4 +19,14 @@ inline double get_current_time() {
     return tv.tv_sec + tv.tv_usec * 1e-6;
 }
 
+inline void warmup(uint8_t* data, size_t size, int stride) {
+    uint64_t sum = 0;
+    double start = get_current_time();
+    for (size_t i = 0; i < size; i += stride) {
+        sum += data[i];
+    }
+    double end = get_current_time();
+    std::cout << "warmup: " << end - start << ", " << sum << std::endl;
+}
+
 #endif //MMAP_TESTS_UTILS_H
