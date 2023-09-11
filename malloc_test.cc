@@ -8,12 +8,11 @@
 #include "utils.h"
 
 int main(int argc, char** argv) {
-    std::string filename = argv[1];
-    int thread_num = atoi(argv[2]);
-    bool seq = (atoi(argv[3]) == 1);
-    size_t count = atoll(argv[4]);
-    size_t window_size = atoll(argv[5]);
-    int stride = atoi(argv[6]);
+    int thread_num = atoi(argv[1]);
+    bool seq = (atoi(argv[2]) == 1);
+    size_t count = atoll(argv[3]);
+    size_t window_size = atoll(argv[4]);
+    int stride = atoi(argv[5]);
 
     std::cout << "start malloc test:" << std::endl;
     std::cout << "\tthread_num = " << thread_num << std::endl;
