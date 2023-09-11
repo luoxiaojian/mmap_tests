@@ -16,3 +16,7 @@ target_link_libraries(mmap_test ${CMAKE_THREAD_LIBS_INIT})
 add_executable(malloc_test malloc_test.cc)
 target_link_libraries(malloc_test ${CMAKE_THREAD_LIBS_INIT})
 
+add_executable(mmap_rnd_test mmap_rnd_test.cc)
+target_link_libraries(mmap_rnd_test ${CMAKE_THREAD_LIBS_INIT})
+add_executable(malloc_rnd_test malloc_rnd_test.cc)
+target_link_libraries(malloc_rnd_test ${CMAKE_THREAD_LIBS_INIT})
