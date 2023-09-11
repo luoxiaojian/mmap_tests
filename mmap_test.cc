@@ -11,16 +11,29 @@
 
 #include "utils.h"
 
+void warmup(uint8_t* data, size_t size, int stride) {
+    uint64_t sum = 0;
+    double start = get_current_time();
+    for (size_t i = 0; i < size; i += stride) {
+      sum += data[i];
+    }
+    double end = get_current_time();
+    std::cout << "warmup: " << end - start << ", " << sum << std::endl;
+}
+
 int main(int argc, char** argv) {
     std::string filename = argv[1];
     int thread_num = atoi(argv[2]);
     bool seq = (atoi(argv[3]) == 1);
     int hint = atoi(argv[4]);
     size_t count = atoll(argv[5]);
-    int stride = argc > 6 ? atoi(argv[6]) : 1;
+    size_t window_size = argc > 6 ? atoll(argv[6]) : std::numeric_limits<size_t>::max();
+    int stride = argc > 7 ? atoi(argv[7]) : 1;
+
+    std::cout << "start test..." << std::endl;
 
     size_t fs = file_size(filename);
-    size_t elem_num = fs / sizeof(uint8_t);
+    size_t elem_num = std::min(fs, window_size) / sizeof(uint8_t);
 
     int fd = open(filename.c_str(), O_RDONLY);
     uint8_t* data = (uint8_t*)mmap(NULL, fs, PROT_READ, MAP_SHARED, fd, 0);
@@ -31,6 +44,8 @@ int main(int argc, char** argv) {
     } else {
         madvise(data, fs, MADV_NORMAL);
     }
+
+    warmup(data, elem_num, stride);
 
     std::vector<std::thread> threads;
     std::atomic<size_t> offset(0);
@@ -79,6 +94,7 @@ int main(int argc, char** argv) {
     double end = get_current_time();
 
     std::cout << "elapsed: " << end - start << ", " << ret.load() << std::endl;
+    std::cout << "access per second: " << static_cast<double>(count) / (end - start) << std::endl;
 
     return 0;
 }
